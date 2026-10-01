@@ -32,7 +32,7 @@ The home page lets a traveler select their profile, and the itinerary screen
 loads the shared schedule from Supabase. Activities can be added, edited,
 favorited, and deleted from the itinerary.
 
-Before using the app, run all eighteen SQL files in `supabase/migrations` in
+Before using the app, run all nineteen SQL files in `supabase/migrations` in
 order in the Supabase SQL Editor:
 
 1. `20260929000000_update_travelers.sql`
@@ -53,6 +53,7 @@ order in the Supabase SQL Editor:
 16. `20260929000015_checklist_item_assignees.sql`
 17. `20260929000016_shared_checklist_completions.sql`
 18. `20260929000017_correct_traveler_name.sql`
+19. `20260929000018_itinerary_cafe_menus.sql`
 
 The app uses a shared, unauthenticated trip: its Row Level Security policies
 allow anyone with the public app URL to read and change these trip records.
@@ -81,6 +82,9 @@ for all travelers, migrates existing shared-category ticks to that common
 state, and enables Realtime updates for shared lists.
 The traveler-name correction migration updates the Syahindah profile and
 existing records from the previous misspelling.
+The itinerary cafe menus migration adds shared image/PDF menu uploads (up to
+20 MB) to itinerary activities using a public Supabase Storage bucket; anyone
+with a menu file URL can view it.
 The Splitwise migrations create shared participants, expenses, equal/custom
 shares, and settlement records, then seed the three trip travelers. The
 custom-shares migration updates the expense-saving database function; run it

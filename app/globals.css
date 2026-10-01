@@ -1513,6 +1513,43 @@ h1 span {
   font-weight: 400;
 }
 
+.activity-form input[type="file"] {
+  min-height: 0;
+  padding: 9px;
+  font-size: 11px;
+}
+
+.itinerary-menu-current {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #82797a;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.itinerary-menu-current button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ad1c36;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.activity-details a {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 7px;
+  color: #ad1c36;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

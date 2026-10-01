@@ -22,6 +22,7 @@ type Activity = {
   tags: string[];
   notes: string | null;
   image_url: string | null;
+  menu_file_path: string | null;
   is_favorite: boolean;
   created_by: string | null;
 };
@@ -46,6 +47,26 @@ const emptyDraft: ActivityDraft = {
   tags: [],
   notes: "",
   image_url: "",
+  menu_file_path: null,
+};
+
+const menuBucket = "itinerary-cafe-menus";
+const maxMenuFileSize = 20 * 1024 * 1024;
+const allowedMenuMimeTypes = [
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+];
+const menuFileExtensions: Record<string, string> = {
+  "application/pdf": "pdf",
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/heic": "heic",
+  "image/heif": "heif",
 };
 
 function Icon({
@@ -131,6 +152,8 @@ export default function Itinerary({ traveler }: { traveler: string }) {
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [draft, setDraft] = useState<ActivityDraft>(emptyDraft);
   const [tagsInput, setTagsInput] = useState("");
+  const [menuFile, setMenuFile] = useState<File | null>(null);
+  const [removeExistingMenu, setRemoveExistingMenu] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
@@ -140,7 +163,7 @@ export default function Itinerary({ traveler }: { traveler: string }) {
       const { data, error } = await supabase
         .from("itinerary_activities")
         .select(
-          "id, day_number, start_time, title, location, transport, travel_duration, activity_duration, tags, notes, image_url, is_favorite, created_by",
+          "id, day_number, start_time, title, location, transport, travel_duration, activity_duration, tags, notes, image_url, menu_file_path, is_favorite, created_by",
         )
         .order("day_number", { ascending: true })
         .order("start_time", { ascending: true });
@@ -177,6 +200,8 @@ export default function Itinerary({ traveler }: { traveler: string }) {
     setEditingActivity(null);
     setDraft({ ...emptyDraft, day_number: activeDay });
     setTagsInput("");
+    setMenuFile(null);
+    setRemoveExistingMenu(false);
     setIsEditorOpen(true);
   }
 
@@ -193,8 +218,11 @@ export default function Itinerary({ traveler }: { traveler: string }) {
       tags: activity.tags,
       notes: activity.notes ?? "",
       image_url: activity.image_url ?? "",
+      menu_file_path: activity.menu_file_path,
     });
     setTagsInput(activity.tags.join(", "));
+    setMenuFile(null);
+    setRemoveExistingMenu(false);
     setIsEditorOpen(true);
   }
 
@@ -204,18 +232,37 @@ export default function Itinerary({ traveler }: { traveler: string }) {
 
     setIsSaving(true);
     setErrorMessage(null);
-    const payload = {
-      ...draft,
-      tags: tagsInput
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-      notes: draft.notes?.trim() || null,
-      image_url: draft.image_url?.trim() || null,
-    };
-
+    let uploadedMenuPath: string | null = null;
     try {
       const supabase = createClient();
+      if (menuFile) {
+        if (!allowedMenuMimeTypes.includes(menuFile.type)) {
+          throw new Error("Choose a menu image or PDF file.");
+        }
+        if (menuFile.size === 0 || menuFile.size > maxMenuFileSize) {
+          throw new Error("The menu file must be smaller than 20 MB.");
+        }
+
+        const extension = menuFileExtensions[menuFile.type];
+        uploadedMenuPath = `${crypto.randomUUID()}.${extension}`;
+        const { error: uploadError } = await supabase.storage
+          .from(menuBucket)
+          .upload(uploadedMenuPath, menuFile, { contentType: menuFile.type, upsert: false });
+        if (uploadError) throw uploadError;
+      }
+
+      const previousMenuPath = editingActivity?.menu_file_path ?? null;
+      const payload = {
+        ...draft,
+        tags: tagsInput
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        notes: draft.notes?.trim() || null,
+        image_url: draft.image_url?.trim() || null,
+        menu_file_path: uploadedMenuPath
+          ?? (removeExistingMenu ? null : previousMenuPath),
+      };
       const result = editingActivity
         ? await supabase
             .from("itinerary_activities")
@@ -227,14 +274,37 @@ export default function Itinerary({ traveler }: { traveler: string }) {
 
       if (result.error) throw result.error;
 
+      uploadedMenuPath = null;
+      if (previousMenuPath && previousMenuPath !== payload.menu_file_path) {
+        const { error: removeError } = await supabase.storage
+          .from(menuBucket)
+          .remove([previousMenuPath]);
+        if (removeError) {
+          console.error("Unable to remove replaced cafe menu:", removeError);
+          setErrorMessage("The activity was saved, but its previous menu file could not be removed.");
+        }
+      }
+
       setActiveDay(payload.day_number);
       setIsEditorOpen(false);
       await loadActivities();
     } catch (error) {
       const message = getErrorMessage(error);
       console.error(`Unable to save trip activity: ${message}`);
+      if (uploadedMenuPath) {
+        const supabase = createClient();
+        const { error: cleanupError } = await supabase.storage
+          .from(menuBucket)
+          .remove([uploadedMenuPath]);
+        if (cleanupError) {
+          console.error("Unable to clean up an unlinked cafe menu upload:", cleanupError);
+        }
+      }
       setErrorMessage(
-        message.includes("itinerary_activities_day_number_fkey") ||
+        message === "Choose a menu image or PDF file." ||
+          message === "The menu file must be smaller than 20 MB."
+          ? message
+          : message.includes("itinerary_activities_day_number_fkey") ||
           message.includes('table "trip_days"')
           ? "This itinerary day is missing from the database. Run the trip-days migration in Supabase, then try again."
           : `We couldn’t save this activity: ${message}`,
@@ -283,6 +353,15 @@ export default function Itinerary({ traveler }: { traveler: string }) {
         .eq("id", activity.id);
 
       if (error) throw error;
+      if (activity.menu_file_path) {
+        const { error: removeError } = await supabase.storage
+          .from(menuBucket)
+          .remove([activity.menu_file_path]);
+        if (removeError) {
+          console.error("Unable to remove cafe menu after deleting its activity:", removeError);
+          setErrorMessage("The activity was deleted, but its menu file could not be removed.");
+        }
+      }
       setActivities((current) => current.filter((item) => item.id !== activity.id));
     } catch (error) {
       const message = getErrorMessage(error);
@@ -398,6 +477,10 @@ export default function Itinerary({ traveler }: { traveler: string }) {
             {visibleActivities.map((activity) => {
               const expanded = expandedIds.includes(activity.id);
               const image = activity.image_url;
+              const menuUrl = activity.menu_file_path
+                ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${menuBucket}/${encodeURIComponent(activity.menu_file_path)}`
+                : null;
+              const menuIsPdf = activity.menu_file_path?.toLowerCase().endsWith(".pdf") ?? false;
 
               return (
                 <article className="activity-card" key={activity.id}>
@@ -438,7 +521,7 @@ export default function Itinerary({ traveler }: { traveler: string }) {
                       <span className="duration-chip">{activity.activity_duration}</span>
                       {activity.tags.map((tag) => <span className="tag-chip" key={tag}>{tag}</span>)}
                     </div>
-                    {(activity.notes || activity.created_by) && (
+                    {(activity.notes || activity.created_by || activity.menu_file_path) && (
                       <button
                         className="details-toggle"
                         type="button"
@@ -458,6 +541,11 @@ export default function Itinerary({ traveler }: { traveler: string }) {
                       <div className="activity-details">
                         {activity.notes && <p>{activity.notes}</p>}
                         {activity.created_by && <span>Added by {activity.created_by}</span>}
+                        {menuUrl && (
+                          <a href={menuUrl} target="_blank" rel="noreferrer">
+                            Open cafe menu{menuIsPdf ? " (PDF)" : ""}
+                          </a>
+                        )}
                       </div>
                     )}
                   </div>
@@ -522,6 +610,34 @@ export default function Itinerary({ traveler }: { traveler: string }) {
               <label>
                 <span>Image URL <small>(optional)</small></span>
                 <input type="url" maxLength={1000} value={draft.image_url ?? ""} onChange={(event) => setDraft({ ...draft, image_url: event.target.value })} placeholder="https://…" />
+              </label>
+              <label>
+                <span>Cafe menu <small>(optional · images or PDF, max 20 MB)</small></span>
+                <input
+                  type="file"
+                  accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif"
+                  onChange={(event) => {
+                    setMenuFile(event.target.files?.[0] ?? null);
+                    setRemoveExistingMenu(false);
+                  }}
+                />
+                {menuFile && <small>Selected: {menuFile.name}</small>}
+                {editingActivity?.menu_file_path && !removeExistingMenu && (
+                  <span className="itinerary-menu-current">
+                    A menu is attached.
+                    <button type="button" onClick={() => setRemoveExistingMenu(true)}>
+                      Remove menu
+                    </button>
+                  </span>
+                )}
+                {editingActivity?.menu_file_path && removeExistingMenu && (
+                  <span className="itinerary-menu-current">
+                    Attached menu will be removed when you save.
+                    <button type="button" onClick={() => setRemoveExistingMenu(false)}>
+                      Keep menu
+                    </button>
+                  </span>
+                )}
               </label>
               <label>
                 <span>Tags <small>(comma separated)</small></span>
