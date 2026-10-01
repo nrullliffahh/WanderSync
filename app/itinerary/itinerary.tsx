@@ -51,7 +51,7 @@ const emptyDraft: ActivityDraft = {
 };
 
 const menuBucket = "itinerary-cafe-menus";
-const maxMenuFileSize = 20 * 1024 * 1024;
+const maxMenuFileSize = 50 * 1024 * 1024;
 const allowedMenuMimeTypes = [
   "application/pdf",
   "image/jpeg",
@@ -240,7 +240,7 @@ export default function Itinerary({ traveler }: { traveler: string }) {
           throw new Error("Choose a menu image or PDF file.");
         }
         if (menuFile.size === 0 || menuFile.size > maxMenuFileSize) {
-          throw new Error("The menu file must be smaller than 20 MB.");
+          throw new Error("The menu file must be 50 MB or smaller.");
         }
 
         const extension = menuFileExtensions[menuFile.type];
@@ -302,7 +302,7 @@ export default function Itinerary({ traveler }: { traveler: string }) {
       }
       setErrorMessage(
         message === "Choose a menu image or PDF file." ||
-          message === "The menu file must be smaller than 20 MB."
+          message === "The menu file must be 50 MB or smaller."
           ? message
           : message.includes("itinerary_activities_day_number_fkey") ||
           message.includes('table "trip_days"')
@@ -612,7 +612,7 @@ export default function Itinerary({ traveler }: { traveler: string }) {
                 <input type="url" maxLength={1000} value={draft.image_url ?? ""} onChange={(event) => setDraft({ ...draft, image_url: event.target.value })} placeholder="https://…" />
               </label>
               <label>
-                <span>Cafe menu <small>(optional · images or PDF, max 20 MB)</small></span>
+                <span>Cafe menu <small>(optional · images or PDF, max 50 MB)</small></span>
                 <input
                   type="file"
                   accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif"
