@@ -3,7 +3,7 @@ import Transit from "./transit";
 
 const travelers = [
   "Iffah Afiqah",
-  "Syahindah Batrisia",
+  "Syahindah Batrishia",
   "Syauqina Qistina",
 ];
 

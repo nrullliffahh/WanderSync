@@ -11,7 +11,7 @@ create policy "Allow shared trip members to add activities"
   with check (
     created_by in (
       'Iffah Afiqah',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'Syauqina Qistina'
     )
   );

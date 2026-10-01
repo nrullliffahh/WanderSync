@@ -3,7 +3,7 @@ import BookingVault from "./booking-vault";
 
 const travelers = [
   "Iffah Afiqah",
-  "Syahindah Batrisia",
+  "Syahindah Batrishia",
   "Syauqina Qistina",
 ];
 

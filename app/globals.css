@@ -2642,11 +2642,29 @@ h1 span {
 
   .itinerary-topbar {
     grid-template-columns: 1fr auto;
-    padding: 0 18px;
+    grid-template-rows: auto auto;
+    row-gap: 8px;
+    padding: 9px 18px;
   }
 
   .itinerary-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+
+  .itinerary-nav::-webkit-scrollbar {
     display: none;
+  }
+
+  .itinerary-nav a,
+  .itinerary-nav span {
+    flex: 0 0 auto;
   }
 
   .itinerary-shell {
@@ -2770,8 +2788,8 @@ h1 span {
   }
 
   .itinerary-topbar {
-    min-height: 60px;
-    padding: 0 13px;
+    min-height: 0;
+    padding: 8px 13px;
   }
 
   .itinerary-brand {

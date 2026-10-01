@@ -6,7 +6,7 @@ select profiles.name
 from (
   values
     ('Iffah Afiqah'),
-    ('Syahindah Batrisia'),
+    ('Syahindah Batrishia'),
     ('Syauqina Qistina')
 ) as profiles(name)
 where not exists (
@@ -34,14 +34,14 @@ create policy "Allow shared trip members to update traveler selection"
   using (
     name in (
       'Iffah Afiqah',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'Syauqina Qistina'
     )
   )
   with check (
     name in (
       'Iffah Afiqah',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'Syauqina Qistina'
     )
   );

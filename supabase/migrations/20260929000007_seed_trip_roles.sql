@@ -49,7 +49,7 @@ from (
     (
       'Booking & Reservations',
       'Early ticket purchases, Colony Suites liaison, check-in/out procedures, and QR code storage.',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'ticket'
     ),
     (

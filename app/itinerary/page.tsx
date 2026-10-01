@@ -3,7 +3,7 @@ import Itinerary from "./itinerary";
 
 const travelers = [
   "Iffah Afiqah",
-  "Syahindah Batrisia",
+  "Syahindah Batrishia",
   "Syauqina Qistina",
 ];
 

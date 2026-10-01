@@ -40,7 +40,7 @@ insert into public.splitwise_people (name)
 select seed.name
 from (values
   ('Iffah Afiqah'),
-  ('Syahindah Batrisia'),
+  ('Syahindah Batrishia'),
   ('Syauqina Qistina')
 ) as seed(name)
 where not exists (

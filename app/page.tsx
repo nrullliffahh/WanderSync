@@ -14,7 +14,7 @@ const travelerProfiles = [
     color: "coral",
   },
   {
-    name: "Syahindah Batrisia",
+    name: "Syahindah Batrishia",
     subtitle: "The memory maker",
     icon: "camera",
     color: "sage",

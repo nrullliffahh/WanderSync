@@ -3,7 +3,7 @@ import Roles from "./roles";
 
 const travelers = [
   "Iffah Afiqah",
-  "Syahindah Batrisia",
+  "Syahindah Batrishia",
   "Syauqina Qistina",
 ];
 

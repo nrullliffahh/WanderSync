@@ -13,7 +13,7 @@ alter table public.budget_items
   check (
     created_by in (
       'Iffah Afiqah',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'Syauqina Qistina'
     )
   );
@@ -43,7 +43,7 @@ create policy "Allow shared trip members to add budget items"
   with check (
     created_by in (
       'Iffah Afiqah',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'Syauqina Qistina'
     )
     and amount > 0
@@ -56,7 +56,7 @@ create policy "Allow shared trip members to update budget items"
   with check (
     created_by in (
       'Iffah Afiqah',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'Syauqina Qistina'
     )
     and amount > 0

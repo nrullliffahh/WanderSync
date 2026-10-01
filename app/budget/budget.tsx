@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { createClient } from "@/utils/supabase/client";
 
-const travelers = ["Iffah Afiqah", "Syahindah Batrisia", "Syauqina Qistina"];
+const travelers = ["Iffah Afiqah", "Syahindah Batrishia", "Syauqina Qistina"];
 const categories = [
   { id: "food", label: "Food & Drinks", icon: "food", tone: "rose" },
   { id: "activities", label: "Tickets & Activities", icon: "ticket", tone: "amber" },

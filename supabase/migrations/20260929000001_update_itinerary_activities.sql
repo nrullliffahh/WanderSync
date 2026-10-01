@@ -16,7 +16,7 @@ begin
         created_by is null
         or created_by in (
           'Iffah Afiqah',
-          'Syahindah Batrisia',
+          'Syahindah Batrishia',
           'Syauqina Qistina'
         )
       );
@@ -88,7 +88,7 @@ create policy "Allow shared trip members to add activities"
   with check (
     created_by in (
       'Iffah Afiqah',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'Syauqina Qistina'
     )
   );
@@ -99,7 +99,7 @@ create policy "Allow shared trip members to update activities"
     created_by is null
     or created_by in (
       'Iffah Afiqah',
-      'Syahindah Batrisia',
+      'Syahindah Batrishia',
       'Syauqina Qistina'
     )
   );

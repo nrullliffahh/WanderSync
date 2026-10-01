@@ -3,7 +3,7 @@ import Budget from "./budget";
 
 const travelers = [
   "Iffah Afiqah",
-  "Syahindah Batrisia",
+  "Syahindah Batrishia",
   "Syauqina Qistina",
 ];
 

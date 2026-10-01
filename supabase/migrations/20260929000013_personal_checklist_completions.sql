@@ -34,7 +34,7 @@ create policy "Allow shared trip members to add checklist completions"
       where travelers.id = checklist_item_completions.traveler_id
         and travelers.name in (
           'Iffah Afiqah',
-          'Syahindah Batrisia',
+          'Syahindah Batrishia',
           'Syauqina Qistina'
         )
     )

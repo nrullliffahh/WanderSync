@@ -31,7 +31,7 @@ create policy "Allow shared trip members to add checklist groups"
         where travelers.id = checklist_groups.owner_traveler_id
           and travelers.name in (
             'Iffah Afiqah',
-            'Syahindah Batrisia',
+            'Syahindah Batrishia',
             'Syauqina Qistina'
           )
       )
@@ -52,7 +52,7 @@ create policy "Allow shared trip members to update checklist groups"
         where travelers.id = checklist_groups.owner_traveler_id
           and travelers.name in (
             'Iffah Afiqah',
-            'Syahindah Batrisia',
+            'Syahindah Batrishia',
             'Syauqina Qistina'
           )
       )

@@ -6,7 +6,7 @@ import type { FormEvent } from "react";
 import type { ReactNode } from "react";
 import { createClient } from "@/utils/supabase/client";
 
-const travelers = ["Iffah Afiqah", "Syahindah Batrisia", "Syauqina Qistina"];
+const travelers = ["Iffah Afiqah", "Syahindah Batrishia", "Syauqina Qistina"];
 
 const roleSuggestions = [
   {
