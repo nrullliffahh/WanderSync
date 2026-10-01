@@ -139,8 +139,7 @@ export default function Budget({ traveler }: { traveler: string }) {
 
   const currentTotals = view === "group" ? totals.group : totals.person;
   const total = categories.reduce((sum, category) => sum + currentTotals[category.id], 0);
-  const groupTotal = categories.reduce((sum, category) => sum + totals.group[category.id], 0);
-  const perPersonEstimate = groupTotal / travelers.length;
+  const perPersonEstimate = categories.reduce((sum, category) => sum + totals.person[category.id], 0);
   const budgetLimit = 1000;
   const progressLimit = view === "person" ? budgetLimit : budgetLimit * travelers.length;
   const budgetProgress = Math.min((total / progressLimit) * 100, 100);
