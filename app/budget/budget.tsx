@@ -128,14 +128,12 @@ export default function Budget({ traveler }: { traveler: string }) {
           sum +
           (item.is_shared
             ? Number(item.amount) / travelers.length
-            : item.created_by === selectedTraveler
-              ? Number(item.amount)
-              : 0),
+            : Number(item.amount)),
         0,
       ),
     ])) as Record<CategoryId, number>;
     return { group, person };
-  }, [items, selectedTraveler]);
+  }, [items]);
 
   const currentTotals = view === "group" ? totals.group : totals.person;
   const total = categories.reduce((sum, category) => sum + currentTotals[category.id], 0);
@@ -314,7 +312,7 @@ export default function Budget({ traveler }: { traveler: string }) {
                           <strong>{formatRM(view === "person"
                             ? item.is_shared
                               ? Number(item.amount) / travelers.length
-                              : item.created_by === selectedTraveler ? Number(item.amount) : 0
+                              : Number(item.amount)
                             : Number(item.amount))}</strong>
                           <button type="button" aria-label={`Edit ${item.item_name}`} onClick={() => openEditItem(item)}><Icon name="edit" size={16} /></button>
                           <button type="button" aria-label={`Delete ${item.item_name}`} onClick={() => void deleteItem(item)}><Icon name="trash" size={16} /></button>
